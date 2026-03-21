@@ -4,6 +4,10 @@ Dashboard interactivo de indicadores macroeconómicos para **América Latina, G7
 
 **Autor:** Juan-Pablo Erráez
 
+## Demo
+
+**[https://jp1309-macro-dashboard.streamlit.app/](https://jp1309-macro-dashboard.streamlit.app/)**
+
 ## Vista rápida
 
 - 27 indicadores económicos (PIB, inflación, empleo, finanzas públicas, sector externo, ahorro e inversión)
@@ -11,11 +15,8 @@ Dashboard interactivo de indicadores macroeconómicos para **América Latina, G7
 - Serie histórica 1980–2024 + proyecciones FMI 2025–2030
 - Gráficos interactivos con Plotly + Streamlit
 - Modo Base 100 para comparar evolución relativa entre países
+- Eje Y duplicado (izquierda y derecha) para lectura desde ambos lados
 - Última actualización de datos: octubre 2025
-
-## Demo
-
-Disponible en [Streamlit Community Cloud](https://share.streamlit.io/) (deploy desde este repo).
 
 ## Requisitos
 
@@ -54,7 +55,7 @@ Se abre automáticamente en **http://localhost:8501**.
 
 ### 3. Deploy en Streamlit Community Cloud
 
-1. Hacer fork o push de este repo a GitHub
+1. Push de este repo a GitHub
 2. Ir a [share.streamlit.io](https://share.streamlit.io/)
 3. New app → seleccionar repo, branch `main`, archivo `streamlit_app.py`
 4. Deploy
@@ -73,15 +74,18 @@ macro-dashboard/
 
 ## Funcionalidades del dashboard
 
-### Controles (sidebar)
+### Controles
+
+Todos los controles están en el cuerpo principal de la página (no en sidebar):
 
 | Control | Descripción |
 |---|---|
 | **Categoría** | Selector para filtrar por grupo de indicadores |
 | **Indicador** | Selector encadenado con los indicadores de la categoría |
-| **Países** | Botones de presets regionales + multi-select manual |
 | **Período** | Slider 1980–2030 |
 | **Base 100** | Toggle para normalizar series al primer año del rango |
+| **Presets** | Botones para seleccionar grupos de países predefinidos |
+| **Países** | Multi-select manual para agregar/quitar países individuales |
 
 ### Presets de países
 
@@ -102,7 +106,8 @@ macro-dashboard/
 - **Línea punteada** con marcador diamante → proyecciones FMI (2025–2030)
 - **Zona sombreada** + línea vertical punteada en 2025 → inicio de proyecciones
 - **Línea negra** en el eje Y=0 para referencia
-- **Colores fijos** por país, maximizando contraste visual
+- **Eje Y duplicado** a izquierda y derecha para facilitar lectura
+- **Colores fijos** por país (Ecuador = rojo intenso), maximizando contraste visual
 - **Hover** muestra solo la información de la línea bajo el cursor
 
 ### Modo Base 100
