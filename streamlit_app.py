@@ -201,6 +201,11 @@ for code in selected_countries:
             )
         )
 
+# Trace invisible para activar eje derecho (mirror)
+fig.add_trace(
+    go.Scatter(x=[None], y=[None], yaxis="y2", showlegend=False, hoverinfo="skip")
+)
+
 if y_min < PROJECTION_YEAR <= y_max:
     fig.add_vrect(
         x0=PROJECTION_YEAR - 0.5, x1=y_max + 0.5,
@@ -228,13 +233,18 @@ fig.update_layout(
         title=y_title, gridcolor="rgba(0,0,0,0.1)",
         zeroline=True, zerolinecolor="black", zerolinewidth=1.5,
     ),
+    yaxis2=dict(
+        overlaying="y", side="right",
+        showgrid=False, zeroline=False,
+        matches="y", showticklabels=True,
+    ),
     template="plotly_white",
     hovermode="closest",
     legend=dict(
         orientation="h", yanchor="top", y=-0.12,
         xanchor="center", x=0.5, font=dict(size=11),
     ),
-    margin=dict(l=60, r=20, t=50, b=100),
+    margin=dict(l=60, r=60, t=50, b=100),
     plot_bgcolor="white",
     height=600,
 )
