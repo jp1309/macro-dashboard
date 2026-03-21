@@ -138,10 +138,11 @@ if preset_cols[-2].button("Todos", use_container_width=True):
 if preset_cols[-1].button("Ninguno", use_container_width=True):
     st.session_state.selected_countries = []
 
+_valid_options = set(country_options.keys())
 selected_countries = st.multiselect(
     "Países seleccionados",
     options=list(country_options.keys()),
-    default=st.session_state.selected_countries,
+    default=[c for c in st.session_state.selected_countries if c in _valid_options],
     format_func=lambda x: country_options.get(x, x),
     label_visibility="collapsed",
 )
