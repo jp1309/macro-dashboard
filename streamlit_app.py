@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "latam_weo_all.csv")
 
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def load_data():
     data = pd.read_csv(DATA_PATH)
     data["is_projection"] = data["is_projection"].astype(str).str.strip().str.lower() == "true"
