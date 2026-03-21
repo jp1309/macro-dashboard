@@ -10,13 +10,13 @@ Dashboard interactivo de indicadores macroeconómicos para **América Latina, G7
 
 ## Vista rápida
 
-- 27 indicadores económicos (PIB, inflación, empleo, finanzas públicas, sector externo, ahorro e inversión)
-- 41 países: 25 América Latina + 7 G7 + 9 Emergentes
-- Serie histórica 1980–2024 + proyecciones FMI 2025–2030
+- 21 indicadores económicos (PIB, inflación, empleo, finanzas públicas, sector externo, ahorro e inversión)
+- 49 países: 25 América Latina + 7 G7 + 17 Emergentes
+- Serie histórica desde 1980 + proyecciones FMI (horizonte dinámico)
+- Actualización automática de datos vía GitHub Actions (abril y octubre)
 - Gráficos interactivos con Plotly + Streamlit
 - Modo Base 100 para comparar evolución relativa entre países
 - Eje Y duplicado (izquierda y derecha) para lectura desde ambos lados
-- Última actualización de datos: octubre 2025
 
 ## Requisitos
 
@@ -34,18 +34,26 @@ Python 3.10+
 python download.py
 ```
 
-Descarga los 27 indicadores desde la API SDMX del FMI para los 41 países. Genera:
+Descarga los 21 indicadores desde la API SDMX del FMI para los 49 países. Genera:
 - Un CSV por indicador (`NGDP_RPCH.csv`, `PCPIPCH.csv`, etc.)
 - Un CSV maestro consolidado: `latam_weo_all.csv`
 
-**Cuándo actualizar:** el FMI publica el WEO dos veces al año:
+No hay año final fijo — la API devuelve todos los años disponibles, incluyendo proyecciones que el FMI extienda a futuro. Los datos históricos se re-descargan completos en cada ejecución (el FMI los reprocesa periódicamente).
 
-| Publicación FMI | Ejecutar script |
+### 2. Actualización automática
+
+Un **GitHub Action** intenta actualizar los datos automáticamente:
+
+| Mes | Días que ejecuta |
 |---|---|
-| Abril | Mayo |
-| Octubre | Noviembre |
+| **Abril** | 14, 15, 16, 17, 18 |
+| **Octubre** | 14, 15, 16, 17, 18 |
 
-### 2. Lanzar el dashboard localmente
+Cada día descarga los datos y compara el CSV con el existente. Si detecta cambios (WEO nuevo publicado), hace commit y push automáticamente — Streamlit Cloud se actualiza solo. Si no hay cambios, no hace nada y reintenta al día siguiente.
+
+También se puede ejecutar manualmente desde la pestaña **Actions** del repo en GitHub.
+
+### 3. Lanzar el dashboard localmente
 
 ```bash
 streamlit run streamlit_app.py
@@ -53,7 +61,7 @@ streamlit run streamlit_app.py
 
 Se abre automáticamente en **http://localhost:8501**.
 
-### 3. Deploy en Streamlit Community Cloud
+### 4. Deploy en Streamlit Community Cloud
 
 1. Push de este repo a GitHub
 2. Ir a [share.streamlit.io](https://share.streamlit.io/)
@@ -64,11 +72,13 @@ Se abre automáticamente en **http://localhost:8501**.
 
 ```
 macro-dashboard/
-├── streamlit_app.py       # Dashboard Streamlit
-├── download.py            # Script de descarga desde API del FMI
-├── requirements.txt       # Dependencias Python
+├── streamlit_app.py              # Dashboard Streamlit
+├── download.py                   # Script de descarga desde API del FMI
+├── requirements.txt              # Dependencias Python
+├── .github/workflows/
+│   └── update-data.yml           # GitHub Action para actualización automática
 ├── .gitignore
-├── latam_weo_all.csv      # CSV maestro (generado por download.py)
+├── latam_weo_all.csv             # CSV maestro (generado por download.py)
 └── README.md
 ```
 
@@ -82,7 +92,7 @@ Todos los controles están en el cuerpo principal de la página (no en sidebar):
 |---|---|
 | **Categoría** | Selector para filtrar por grupo de indicadores |
 | **Indicador** | Selector encadenado con los indicadores de la categoría |
-| **Período** | Slider 1980–2030 |
+| **Período** | Slider dinámico según rango disponible en los datos |
 | **Base 100** | Toggle para normalizar series al primer año del rango |
 | **Presets** | Botones para seleccionar grupos de países predefinidos |
 | **Países** | Multi-select manual para agregar/quitar países individuales |
@@ -96,15 +106,15 @@ Todos los controles están en el cuerpo principal de la página (no en sidebar):
 | **Caribe** | Cuba, Rep. Dominicana, Haití, Jamaica, Trinidad y Tobago, Surinam, Guyana |
 | **Andinos** | Ecuador, Perú, Bolivia, Colombia |
 | **G7** | EE.UU., Japón, Alemania, Reino Unido, Francia, Italia, Canadá |
-| **Emergentes** | Australia, China, India, Indonesia, Rusia, Arabia Saudita, Sudáfrica, Corea del Sur, Turquía |
-| **Todos** | Los 41 países |
+| **Emergentes** | Australia, China, India, Indonesia, Rusia, Arabia Saudita, Sudáfrica, Corea del Sur, Turquía, Taiwán, Singapur, EAU, Filipinas, Vietnam, Malasia, Egipto, Nigeria |
+| **Todos** | Los 49 países |
 | **Ninguno** | Limpia la selección |
 
 ### Visualización
 
-- **Línea sólida** → datos observados (hasta 2024)
-- **Línea punteada** con marcador diamante → proyecciones FMI (2025–2030)
-- **Zona sombreada** + línea vertical punteada en 2025 → inicio de proyecciones
+- **Línea sólida** → datos observados
+- **Línea punteada** con marcador diamante → proyecciones FMI
+- **Zona sombreada** + línea vertical punteada → inicio de proyecciones
 - **Línea negra** en el eje Y=0 para referencia
 - **Eje Y duplicado** a izquierda y derecha para facilitar lectura
 - **Colores fijos** por país (Ecuador = rojo intenso), maximizando contraste visual
@@ -120,21 +130,21 @@ Activa el toggle **"Base 100"** para normalizar todas las series al valor del pr
 
 ## Datos
 
-### Países (41)
+### Países (49)
 
 **América Latina (25):** Argentina, Belice, Bolivia, Brasil, Chile, Colombia, Costa Rica, Cuba, Ecuador, El Salvador, Guatemala, Guyana, Haití, Honduras, Jamaica, México, Nicaragua, Panamá, Paraguay, Perú, República Dominicana, Surinam, Trinidad y Tobago, Uruguay, Venezuela
 
 **G7 (7):** Alemania, Canadá, Estados Unidos, Francia, Italia, Japón, Reino Unido
 
-**Emergentes (9):** Arabia Saudita, Australia, China, Corea del Sur, India, Indonesia, Rusia, Sudáfrica, Turquía
+**Emergentes (17):** Arabia Saudita, Australia, China, Corea del Sur, Egipto, Emiratos Árabes Unidos, Filipinas, India, Indonesia, Malasia, Nigeria, Rusia, Singapur, Sudáfrica, Taiwán, Turquía, Vietnam
 
-### Indicadores (27)
+### Indicadores (21)
 
 | Categoría | Indicadores |
 |---|---|
-| **PIB y Crecimiento** | Crecimiento real del PIB, PIB nominal (USD y moneda local), PIB per cápita, PIB PPA, PIB PPA per cápita |
-| **Precios y Empleo** | Inflación IPC, Inflación esperada, Desempleo, Empleo total, Población |
-| **Finanzas Públicas** | Ingresos y gasto gobierno (% PIB y moneda local), Balance fiscal, Deuda pública bruta |
+| **PIB y Crecimiento** | Crecimiento real del PIB, PIB nominal (USD), PIB per cápita, PIB PPA, PIB PPA per cápita |
+| **Precios y Empleo** | Inflación IPC, Desempleo, Empleo total, Población |
+| **Finanzas Públicas** | Ingresos gobierno (% PIB), Gasto gobierno (% PIB), Balance fiscal (% PIB), Deuda pública bruta (% PIB) |
 | **Sector Externo** | Cuenta corriente (% PIB y USD), Crecimiento de exportaciones e importaciones (total y bienes) |
 | **Ahorro e Inversión** | Inversión total (% PIB), Ahorro nacional bruto (% PIB) |
 
@@ -144,9 +154,9 @@ Activa el toggle **"Base 100"** para normalizar todas las series al valor del pr
 |---|---|
 | `country_code` | Código ISO3 del país |
 | `country_name` | Nombre en español |
-| `year` | Año (1980–2030) |
+| `year` | Año (desde 1980 hasta el horizonte máximo del FMI) |
 | `value` | Valor numérico del indicador |
-| `is_projection` | `True` si el año ≥ 2025 (proyección FMI) |
+| `is_projection` | `True` si el año ≥ año actual (proyección FMI) |
 | `indicator_code` | Código WEO del FMI |
 | `indicator_description` | Descripción en español |
 
@@ -158,7 +168,9 @@ El script `download.py` usa la API SDMX del FMI:
 https://api.imf.org/external/sdmx/2.1/data/IMF.RES,WEO,+/{países}.{indicador}.A
 ```
 
-Consideraciones de rate-limit:
-- Requests separados por grupo (LATAM, G7, Emergentes)
+Consideraciones:
+- Sin `endPeriod` fijo — descarga todos los años disponibles
+- Requests separados por grupo (LATAM, G7, Emergentes) para evitar rate-limit
 - 3 segundos de pausa entre requests
 - Reintentos con backoff exponencial (10s, 20s, 40s) hasta 4 intentos
+- Datos históricos se re-descargan completos (el FMI los reprocesa)
