@@ -8,13 +8,11 @@ build/
 # CSVs individuales por indicador (se regeneran con download.py)
 # El maestro latam_weo_all.csv SÍ se incluye (necesario para deploy)
 NGDP_RPCH.csv
-NGDP.csv
 NGDPD.csv
 NGDPPC.csv
 PPPGDP.csv
 PPPPC.csv
 PCPIPCH.csv
-PCPIEPCH.csv
 LUR.csv
 LE.csv
 LP.csv
@@ -22,10 +20,6 @@ GGR_NGDP.csv
 GGX_NGDP.csv
 GGXCNL_NGDP.csv
 GGXWDG_NGDP.csv
-GGR.csv
-GGX.csv
-GGXCNL.csv
-GGXWDG.csv
 BCA_NGDPD.csv
 BCA.csv
 TX_RPCH.csv

@@ -59,13 +59,15 @@ COUNTRY_COLORS = {
     "AUS": "#FFCD00",  "CHN": "#DE2910",  "IND": "#FF9933",  "IDN": "#CC0000",
     "RUS": "#0039A6",  "SAU": "#006C35",  "ZAF": "#007749",  "KOR": "#003478",
     "TUR": "#E30A17",
+    "TWN": "#4B0082",  "SGP": "#E8A317",  "ARE": "#BF00FF",  "PHL": "#1E90FF",
+    "VNM": "#8B4513",  "MYS": "#00C78C",  "EGY": "#CD853F",  "NGA": "#2F4F4F",
 }
 
 # ── Indicadores ──────────────────────────────────────────────────────────────
 INDICATOR_GROUPS = {
-    "PIB y Crecimiento": ["NGDP_RPCH", "NGDPD", "NGDP", "NGDPPC", "PPPGDP", "PPPPC"],
-    "Precios y Empleo": ["PCPIPCH", "PCPIEPCH", "LUR", "LP"],
-    "Finanzas Públicas": ["GGR_NGDP", "GGX_NGDP", "GGXCNL_NGDP", "GGXWDG_NGDP", "GGR", "GGX", "GGXCNL", "GGXWDG"],
+    "PIB y Crecimiento": ["NGDP_RPCH", "NGDPD", "NGDPPC", "PPPGDP", "PPPPC"],
+    "Precios y Empleo": ["PCPIPCH", "LUR", "LP"],
+    "Finanzas Públicas": ["GGR_NGDP", "GGX_NGDP", "GGXCNL_NGDP", "GGXWDG_NGDP"],
     "Sector Externo": ["BCA_NGDPD", "BCA", "TX_RPCH", "TM_RPCH", "TXG_RPCH", "TMG_RPCH"],
     "Ahorro e Inversión": ["NID_NGDP", "NGSD_NGDP"],
 }
@@ -73,10 +75,9 @@ INDICATOR_GROUPS = {
 indicator_lookup = dict(zip(indicators["indicator_code"], indicators["indicator_description"]))
 
 BASE100_ALLOWED = {
-    "NGDPD", "NGDP", "NGDPPC", "PPPGDP", "PPPPC",
+    "NGDPD", "NGDPPC", "PPPGDP", "PPPPC",
     "LP", "LE", "LUR",
     "GGR_NGDP", "GGX_NGDP", "GGXWDG_NGDP",
-    "GGR", "GGX", "GGXWDG",
     "NID_NGDP", "NGSD_NGDP",
 }
 
@@ -87,7 +88,7 @@ PRESETS = {
     "Caribe": ["CUB", "DOM", "HTI", "JAM", "TTO", "SUR", "GUY"],
     "Andinos": ["ECU", "PER", "BOL", "COL"],
     "G7": ["USA", "JPN", "DEU", "GBR", "FRA", "ITA", "CAN"],
-    "Emergentes": ["AUS", "CHN", "IND", "IDN", "RUS", "SAU", "ZAF", "KOR", "TUR"],
+    "Emergentes": ["AUS", "CHN", "IND", "IDN", "RUS", "SAU", "ZAF", "KOR", "TUR", "TWN", "SGP", "ARE", "PHL", "VNM", "MYS", "EGY", "NGA"],
 }
 
 country_options = dict(zip(countries["country_code"], countries["country_name"]))

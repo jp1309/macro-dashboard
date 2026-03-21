@@ -88,6 +88,14 @@ EMERGENTES = {
     "ZAF": "Sudáfrica",
     "KOR": "Corea del Sur",
     "TUR": "Turquía",
+    "TWN": "Taiwán",
+    "SGP": "Singapur",
+    "ARE": "Emiratos Árabes Unidos",
+    "PHL": "Filipinas",
+    "VNM": "Vietnam",
+    "MYS": "Malasia",
+    "EGY": "Egipto",
+    "NGA": "Nigeria",
 }
 
 # Todos los países a descargar
@@ -104,14 +112,12 @@ COUNTRY_GROUPS = [
 INDICATORS = {
     # PIB y Crecimiento
     "NGDP_RPCH":   "Crecimiento real del PIB (%)",
-    "NGDP":        "PIB nominal (moneda local, miles de millones)",
     "NGDPD":       "PIB nominal (USD, miles de millones)",
     "NGDPPC":      "PIB per cápita (USD)",
     "PPPGDP":      "PIB PPA (miles de millones USD)",
     "PPPPC":       "PIB PPA per cápita (USD)",
     # Precios y Empleo
     "PCPIPCH":     "Inflación IPC (%)",
-    "PCPIEPCH":    "Inflación esperada IPC (%)",
     "LUR":         "Tasa de desempleo (%)",
     "LE":          "Empleo total (millones)",
     "LP":          "Población (millones)",
@@ -120,10 +126,6 @@ INDICATORS = {
     "GGX_NGDP":    "Gasto gobierno (% PIB)",
     "GGXCNL_NGDP": "Balance fiscal neto (% PIB)",
     "GGXWDG_NGDP": "Deuda pública bruta (% PIB)",
-    "GGR":         "Ingresos gobierno (moneda local)",
-    "GGX":         "Gasto gobierno (moneda local)",
-    "GGXCNL":      "Balance fiscal neto (moneda local)",
-    "GGXWDG":      "Deuda pública bruta (moneda local)",
     # Sector Externo
     "BCA_NGDPD":   "Cuenta corriente (% PIB)",
     "BCA":         "Cuenta corriente (USD, miles de millones)",
