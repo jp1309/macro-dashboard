@@ -14,16 +14,16 @@ Recomendación: correr este script en mayo y noviembre de cada año.
 
 CÓMO ACTUALIZAR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-1. Ajustar END_YEAR abajo si el horizonte de proyección del FMI cambió
-   (actualmente proyecta ~5 años hacia adelante desde el año en curso).
-2. Correr:
+1. Correr:
        python download.py
-3. Los CSVs individuales y el maestro se sobreescriben automáticamente.
+2. Los CSVs individuales y el maestro se sobreescriben automáticamente.
+3. No hay END_YEAR fijo — la API devuelve todos los años disponibles,
+   incluyendo nuevas proyecciones que el FMI extienda.
 
 NOTA SOBRE PROYECCIONES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-El umbral de proyecciones está definido en PROJECTION_START_YEAR.
-Actualmente = 2025. Actualizar cuando cierre el año fiscal.
+PROJECTION_START_YEAR se calcula automáticamente como el año actual.
+Datos del año en curso y posteriores se marcan como proyección.
 """
 import sys
 import requests
@@ -33,9 +33,11 @@ import os
 import time
 
 # ── Configuración de años ───────────────────────────────────────────────────
-START_YEAR           = 1980
-END_YEAR             = 2030   # horizonte máximo de proyecciones FMI
-PROJECTION_START_YEAR = 2025  # primer año sin datos observados
+import datetime
+START_YEAR            = 1980
+# Sin END_YEAR fijo: la API devuelve todos los años disponibles (incluye
+# proyecciones que el FMI extienda a futuro, ej. 2031+).
+PROJECTION_START_YEAR = datetime.date.today().year  # primer año sin datos observados
 
 # ── Países de América Latina (código ISO3 WEO) ─────────────────────────────
 LATAM = {
@@ -151,7 +153,7 @@ def _fetch_group(indicator: str, country_codes: list) -> list:
     countries_key = "+".join(country_codes)
     url = (
         f"{BASE_URL}{countries_key}.{indicator}.A"
-        f"?startPeriod={START_YEAR}&endPeriod={END_YEAR}"
+        f"?startPeriod={START_YEAR}"
     )
     for attempt in range(1, MAX_RETRIES + 1):
         try:
@@ -205,7 +207,7 @@ def main():
     all_frames = []
 
     print(f"Descargando {total} indicadores para {len(ALL_COUNTRIES)} paises "
-          f"({START_YEAR}-{END_YEAR})...\n", flush=True)
+          f"(desde {START_YEAR})...\n", flush=True)
 
     for i, (code, description) in enumerate(INDICATORS.items(), 1):
         sys.stdout.write(f"[{i:02d}/{total}] {code} ... ")
@@ -237,7 +239,8 @@ def main():
         print(f"\nCSV maestro: latam_weo_all.csv")
         print(f"  Total filas : {len(master):,}")
         print(f"  Observados  : {obs:,}  (hasta {PROJECTION_START_YEAR - 1})")
-        print(f"  Proyecciones: {proj:,}  ({PROJECTION_START_YEAR}-{END_YEAR})")
+        max_year = int(master["year"].max())
+        print(f"  Proyecciones: {proj:,}  ({PROJECTION_START_YEAR}-{max_year})")
         print(f"\nProxima actualizacion recomendada:")
         print(f"  Mayo    (tras publicacion WEO de abril)")
         print(f"  Noviembre (tras publicacion WEO de octubre)")

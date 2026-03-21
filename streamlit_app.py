@@ -43,7 +43,7 @@ countries = (
 
 YEAR_MIN = int(df["year"].min())
 YEAR_MAX = int(df["year"].max())
-PROJECTION_YEAR = 2025
+PROJECTION_YEAR = int(df.loc[df["is_projection"], "year"].min()) if df["is_projection"].any() else YEAR_MAX + 1
 
 # ── Colores fijos por país ───────────────────────────────────────────────────
 COUNTRY_COLORS = {
