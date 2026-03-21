@@ -92,64 +92,59 @@ PRESETS = {
 
 country_options = dict(zip(countries["country_code"], countries["country_name"]))
 
+# Inicializar selección
+if "selected_countries" not in st.session_state:
+    st.session_state.selected_countries = list(PRESETS["Andinos"])
+
 # ── Header ───────────────────────────────────────────────────────────────────
 st.markdown(
-    "<h2 style='text-align:center;'>"
+    "<h2 style='text-align:center; margin-bottom:0.5rem;'>"
     "<span style='font-weight:700;'>Macro Dashboard</span>"
     "<span style='font-weight:300;'> — FMI World Economic Outlook</span>"
     "</h2>",
     unsafe_allow_html=True,
 )
 
-# ── Sidebar: Controles ──────────────────────────────────────────────────────
-with st.sidebar:
-    st.header("Controles")
+# ── Fila 1: Categoría, Indicador, Período, Base 100 ─────────────────────────
+col_cat, col_ind, col_period, col_base = st.columns([2, 3, 4, 1])
 
-    # Categoría → Indicador
+with col_cat:
     group = st.selectbox("Categoría", list(INDICATOR_GROUPS.keys()))
+
+with col_ind:
     available_codes = [c for c in INDICATOR_GROUPS[group] if c in indicator_lookup]
     available_labels = [indicator_lookup[c] for c in available_codes]
     ind_label = st.selectbox("Indicador", available_labels)
     indicator = available_codes[available_labels.index(ind_label)]
 
-    st.divider()
-
-    # Presets
-    st.subheader("Países")
-    preset_cols = st.columns(3)
-    preset_names = list(PRESETS.keys())
-
-    # Inicializar selección
-    if "selected_countries" not in st.session_state:
-        st.session_state.selected_countries = list(PRESETS["Andinos"])
-
-    for i, name in enumerate(preset_names):
-        col = preset_cols[i % 3]
-        if col.button(name, use_container_width=True, key=f"preset_{name}"):
-            st.session_state.selected_countries = list(PRESETS[name])
-
-    # Botones especiales
-    col_all, col_none = st.columns(2)
-    if col_all.button("Todos", use_container_width=True):
-        st.session_state.selected_countries = list(countries["country_code"])
-    if col_none.button("Ninguno", use_container_width=True):
-        st.session_state.selected_countries = []
-
-    selected_countries = st.multiselect(
-        "Selección",
-        options=list(country_options.keys()),
-        default=st.session_state.selected_countries,
-        format_func=lambda x: country_options.get(x, x),
-    )
-    st.session_state.selected_countries = selected_countries
-
-    st.divider()
-
-    # Período
+with col_period:
     year_range = st.slider("Período", YEAR_MIN, YEAR_MAX, (2000, YEAR_MAX))
 
-    # Base 100
-    base100 = st.toggle("Base 100", value=False)
+with col_base:
+    st.markdown("<br>", unsafe_allow_html=True)
+    base100 = st.toggle("Base 100")
+
+# ── Fila 2: Presets + Países ─────────────────────────────────────────────────
+preset_names = list(PRESETS.keys())
+preset_cols = st.columns(len(preset_names) + 2)
+
+for i, name in enumerate(preset_names):
+    if preset_cols[i].button(name, use_container_width=True, key=f"preset_{name}"):
+        st.session_state.selected_countries = list(PRESETS[name])
+
+if preset_cols[-2].button("Todos", use_container_width=True):
+    st.session_state.selected_countries = list(countries["country_code"])
+if preset_cols[-1].button("Ninguno", use_container_width=True):
+    st.session_state.selected_countries = []
+
+selected_countries = st.multiselect(
+    "Países seleccionados",
+    options=list(country_options.keys()),
+    default=st.session_state.selected_countries,
+    format_func=lambda x: country_options.get(x, x),
+    label_visibility="collapsed",
+)
+st.session_state.selected_countries = selected_countries
 
 # ── Gráfico ──────────────────────────────────────────────────────────────────
 y_min, y_max = year_range
@@ -241,6 +236,7 @@ fig.update_layout(
     ),
     margin=dict(l=60, r=20, t=50, b=100),
     plot_bgcolor="white",
+    height=600,
 )
 
 st.plotly_chart(fig, use_container_width=True)
