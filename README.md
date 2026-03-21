@@ -1,14 +1,21 @@
-# LATAM Macro Dashboard
+# Macro Dashboard — FMI World Economic Outlook
 
 Dashboard interactivo de indicadores macroeconómicos para **América Latina, G7 y Emergentes**, construido con datos del [World Economic Outlook (WEO)](https://www.imf.org/en/Publications/WEO) del FMI.
+
+**Autor:** Juan-Pablo Erráez
 
 ## Vista rápida
 
 - 27 indicadores económicos (PIB, inflación, empleo, finanzas públicas, sector externo, ahorro e inversión)
 - 41 países: 25 América Latina + 7 G7 + 9 Emergentes
 - Serie histórica 1980–2024 + proyecciones FMI 2025–2030
-- Gráficos interactivos con Plotly, interfaz con Dash + Bootstrap
+- Gráficos interactivos con Plotly + Streamlit
 - Modo Base 100 para comparar evolución relativa entre países
+- Última actualización de datos: octubre 2025
+
+## Demo
+
+Disponible en [Streamlit Community Cloud](https://share.streamlit.io/) (deploy desde este repo).
 
 ## Requisitos
 
@@ -31,44 +38,50 @@ Descarga los 27 indicadores desde la API SDMX del FMI para los 41 países. Gener
 - Un CSV maestro consolidado: `latam_weo_all.csv`
 
 **Cuándo actualizar:** el FMI publica el WEO dos veces al año:
+
 | Publicación FMI | Ejecutar script |
 |---|---|
 | Abril | Mayo |
 | Octubre | Noviembre |
 
-### 2. Lanzar el dashboard
+### 2. Lanzar el dashboard localmente
 
 ```bash
-python app.py
+streamlit run streamlit_app.py
 ```
 
-Abrir **http://127.0.0.1:8060/** en el navegador.
+Se abre automáticamente en **http://localhost:8501**.
+
+### 3. Deploy en Streamlit Community Cloud
+
+1. Hacer fork o push de este repo a GitHub
+2. Ir a [share.streamlit.io](https://share.streamlit.io/)
+3. New app → seleccionar repo, branch `main`, archivo `streamlit_app.py`
+4. Deploy
 
 ## Estructura del proyecto
 
 ```
-latam_weo_data/
-├── app.py                 # Dashboard Dash/Plotly
+macro-dashboard/
+├── streamlit_app.py       # Dashboard Streamlit
 ├── download.py            # Script de descarga desde API del FMI
 ├── requirements.txt       # Dependencias Python
 ├── .gitignore
-├── latam_weo_all.csv      # CSV maestro (generado)
-├── NGDP_RPCH.csv          # CSVs individuales por indicador (generados)
-├── ...                    # (27 CSVs de indicadores)
+├── latam_weo_all.csv      # CSV maestro (generado por download.py)
 └── README.md
 ```
 
 ## Funcionalidades del dashboard
 
-### Controles
+### Controles (sidebar)
 
 | Control | Descripción |
 |---|---|
-| **Categoría** | Dropdown para filtrar por grupo de indicadores |
-| **Indicador** | Dropdown encadenado con los indicadores de la categoría seleccionada |
-| **Países** | Multi-select + botones de presets regionales |
-| **Período** | Range slider 1980–2030 |
-| **Base 100** | Switch para normalizar todas las series al primer año del rango seleccionado |
+| **Categoría** | Selector para filtrar por grupo de indicadores |
+| **Indicador** | Selector encadenado con los indicadores de la categoría |
+| **Países** | Botones de presets regionales + multi-select manual |
+| **Período** | Slider 1980–2030 |
+| **Base 100** | Toggle para normalizar series al primer año del rango |
 
 ### Presets de países
 
@@ -83,24 +96,22 @@ latam_weo_data/
 | **Todos** | Los 41 países |
 | **Ninguno** | Limpia la selección |
 
-**Combinar grupos:** mantener presionada la tecla **CTRL** al hacer click en un preset para agregar esos países a la selección actual (ej: CTRL+Andinos + CTRL+G7).
-
 ### Visualización
 
 - **Línea sólida** → datos observados (hasta 2024)
 - **Línea punteada** con marcador diamante → proyecciones FMI (2025–2030)
 - **Zona sombreada** + línea vertical punteada en 2025 → inicio de proyecciones
 - **Línea negra** en el eje Y=0 para referencia
-- **Colores fijos** por país, diferenciados para máximo contraste visual
-- **Hover** muestra solo la información de la línea sobre la que se pasa el mouse
+- **Colores fijos** por país, maximizando contraste visual
+- **Hover** muestra solo la información de la línea bajo el cursor
 
 ### Modo Base 100
 
-Activa el switch **"Base 100"** para normalizar todas las series al valor del primer año del rango seleccionado. Útil para comparar evolución relativa entre países con magnitudes muy distintas (ej: PIB nominal de Brasil vs. Bolivia).
+Activa el toggle **"Base 100"** para normalizar todas las series al valor del primer año del rango seleccionado. Útil para comparar evolución relativa entre países con magnitudes muy distintas (ej: PIB nominal de Brasil vs. Bolivia).
 
 - El año base cambia automáticamente al mover el slider de período
 - El título y eje Y muestran `Base 100 = {año}`
-- **No aplica** a indicadores que pueden tener valores negativos o cero en el año base (balance fiscal, cuenta corriente, crecimiento del PIB). En ese caso se muestra un aviso y los datos se presentan en su unidad original.
+- **No aplica** a tasas de variación ni indicadores con valores negativos (crecimiento del PIB, inflación, balance fiscal, cuenta corriente, crecimiento de comercio). Se muestra un aviso y los datos se presentan en su unidad original.
 
 ## Datos
 
@@ -143,6 +154,6 @@ https://api.imf.org/external/sdmx/2.1/data/IMF.RES,WEO,+/{países}.{indicador}.A
 ```
 
 Consideraciones de rate-limit:
-- Requests separados por grupo (LATAM, G7, Emergentes) — máx ~25 países por request
+- Requests separados por grupo (LATAM, G7, Emergentes)
 - 3 segundos de pausa entre requests
 - Reintentos con backoff exponencial (10s, 20s, 40s) hasta 4 intentos
