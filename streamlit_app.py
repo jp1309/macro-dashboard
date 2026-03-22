@@ -179,12 +179,15 @@ for code in selected_countries:
     obs = sub[~sub["is_projection"]]
     proj = sub[sub["is_projection"]]
 
+    line_width = 3.5 if code == "ECU" else 2
+    marker_size = 6 if code == "ECU" else 4
+
     fig.add_trace(
         go.Scatter(
             x=obs["year"], y=obs["value"],
             mode="lines+markers", name=name,
-            line=dict(color=color, width=2),
-            marker=dict(size=4, color=color),
+            line=dict(color=color, width=line_width),
+            marker=dict(size=marker_size, color=color),
             legendgroup=code,
             hovertemplate=f"<b>{name}</b><br>%{{x}}: %{{y:,.2f}}<extra></extra>",
         )
@@ -196,8 +199,8 @@ for code in selected_countries:
             go.Scatter(
                 x=bridge["year"], y=bridge["value"],
                 mode="lines+markers", name=f"{name} (proy.)",
-                line=dict(color=color, width=2, dash="dot"),
-                marker=dict(size=4, color=color, symbol="diamond-open"),
+                line=dict(color=color, width=line_width, dash="dot"),
+                marker=dict(size=marker_size, color=color, symbol="diamond-open"),
                 legendgroup=code, showlegend=False,
                 hovertemplate=f"<b>{name} (proy.)</b><br>%{{x}}: %{{y:,.2f}}<extra></extra>",
             )
