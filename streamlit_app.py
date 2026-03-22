@@ -65,7 +65,7 @@ COUNTRY_COLORS = {
 
 # ── Indicadores ──────────────────────────────────────────────────────────────
 INDICATOR_GROUPS = {
-    "PIB y Crecimiento": ["NGDP_RPCH", "NGDPD", "NGDPPC", "PPPGDP", "PPPPC"],
+    "PIB y Crecimiento": ["NGDP_RPCH", "NGDPD", "NGDPDPC", "PPPGDP", "PPPPC"],
     "Precios y Empleo": ["PCPIPCH", "LUR", "LP"],
     "Finanzas Públicas": ["GGR_NGDP", "GGX_NGDP", "GGXCNL_NGDP", "GGXWDG_NGDP"],
     "Sector Externo": ["BCA_NGDPD", "BCA", "TX_RPCH", "TM_RPCH", "TXG_RPCH", "TMG_RPCH"],
@@ -75,7 +75,7 @@ INDICATOR_GROUPS = {
 indicator_lookup = dict(zip(indicators["indicator_code"], indicators["indicator_description"]))
 
 BASE100_ALLOWED = {
-    "NGDPD", "NGDPPC", "PPPGDP", "PPPPC",
+    "NGDPD", "NGDPDPC", "PPPGDP", "PPPPC",
     "LP", "LE", "LUR",
     "GGR_NGDP", "GGX_NGDP", "GGXWDG_NGDP",
     "NID_NGDP", "NGSD_NGDP",

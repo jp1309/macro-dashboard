@@ -9,7 +9,7 @@ build/
 # El maestro latam_weo_all.csv SÍ se incluye (necesario para deploy)
 NGDP_RPCH.csv
 NGDPD.csv
-NGDPPC.csv
+NGDPDPC.csv
 PPPGDP.csv
 PPPPC.csv
 PCPIPCH.csv

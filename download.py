@@ -115,7 +115,7 @@ INDICATORS = {
     # PIB y Crecimiento
     "NGDP_RPCH":   "Crecimiento real del PIB (%)",
     "NGDPD":       "PIB nominal (USD, miles de millones)",
-    "NGDPPC":      "PIB per cápita (USD)",
+    "NGDPDPC":     "PIB per cápita (USD)",
     "PPPGDP":      "PIB PPA (miles de millones USD)",
     "PPPPC":       "PIB PPA per cápita (USD)",
     # Precios y Empleo
