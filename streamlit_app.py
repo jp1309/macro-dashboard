@@ -237,7 +237,7 @@ if "lang" not in st.session_state:
 col_header, col_lang = st.columns([9, 1])
 
 with col_lang:
-    if st.button("EN" if st.session_state.lang == "es" else "ES",
+    if st.button("English" if st.session_state.lang == "es" else "Español",
                  use_container_width=True, key="lang_toggle"):
         st.session_state.lang = "en" if st.session_state.lang == "es" else "es"
         st.rerun()
