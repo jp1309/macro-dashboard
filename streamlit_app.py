@@ -434,7 +434,7 @@ country_summaries_to_show = [
 
 if country_summaries_to_show:
     weo_title = "WEO Octubre 2025 — Resumen por país" if st.session_state.lang == "es" else "WEO October 2025 — Country Summary"
-    with st.expander(weo_title, expanded=False):
+    with st.expander(weo_title, expanded=True):
         for code, name, summary in country_summaries_to_show:
             color = COUNTRY_COLORS.get(code, "#636EFA")
             st.markdown(
