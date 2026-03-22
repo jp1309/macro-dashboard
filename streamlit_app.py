@@ -432,13 +432,34 @@ country_summaries_to_show = [
     if summaries_lang.get(code)
 ]
 
+COUNTRY_FLAGS = {
+    "ARG": "\U0001F1E6\U0001F1F7", "BOL": "\U0001F1E7\U0001F1F4", "BRA": "\U0001F1E7\U0001F1F7",
+    "CHL": "\U0001F1E8\U0001F1F1", "COL": "\U0001F1E8\U0001F1F4", "CRI": "\U0001F1E8\U0001F1F7",
+    "CUB": "\U0001F1E8\U0001F1FA", "DOM": "\U0001F1E9\U0001F1F4", "ECU": "\U0001F1EA\U0001F1E8",
+    "SLV": "\U0001F1F8\U0001F1FB", "GTM": "\U0001F1EC\U0001F1F9", "GUY": "\U0001F1EC\U0001F1FE",
+    "HTI": "\U0001F1ED\U0001F1F9", "HND": "\U0001F1ED\U0001F1F3", "JAM": "\U0001F1EF\U0001F1F2",
+    "MEX": "\U0001F1F2\U0001F1FD", "NIC": "\U0001F1F3\U0001F1EE", "PAN": "\U0001F1F5\U0001F1E6",
+    "PRY": "\U0001F1F5\U0001F1FE", "PER": "\U0001F1F5\U0001F1EA", "URY": "\U0001F1FA\U0001F1FE",
+    "VEN": "\U0001F1FB\U0001F1EA", "BLZ": "\U0001F1E7\U0001F1FF", "SUR": "\U0001F1F8\U0001F1F7",
+    "TTO": "\U0001F1F9\U0001F1F9", "USA": "\U0001F1FA\U0001F1F8", "JPN": "\U0001F1EF\U0001F1F5",
+    "DEU": "\U0001F1E9\U0001F1EA", "GBR": "\U0001F1EC\U0001F1E7", "FRA": "\U0001F1EB\U0001F1F7",
+    "ITA": "\U0001F1EE\U0001F1F9", "CAN": "\U0001F1E8\U0001F1E6", "AUS": "\U0001F1E6\U0001F1FA",
+    "CHN": "\U0001F1E8\U0001F1F3", "IND": "\U0001F1EE\U0001F1F3", "IDN": "\U0001F1EE\U0001F1E9",
+    "RUS": "\U0001F1F7\U0001F1FA", "SAU": "\U0001F1F8\U0001F1E6", "ZAF": "\U0001F1FF\U0001F1E6",
+    "KOR": "\U0001F1F0\U0001F1F7", "TUR": "\U0001F1F9\U0001F1F7", "TWN": "\U0001F1F9\U0001F1FC",
+    "SGP": "\U0001F1F8\U0001F1EC", "ARE": "\U0001F1E6\U0001F1EA", "PHL": "\U0001F1F5\U0001F1ED",
+    "VNM": "\U0001F1FB\U0001F1F3", "MYS": "\U0001F1F2\U0001F1FE", "EGY": "\U0001F1EA\U0001F1EC",
+    "NGA": "\U0001F1F3\U0001F1EC",
+}
+
 if country_summaries_to_show:
     weo_title = "WEO Octubre 2025 — Resumen por país" if st.session_state.lang == "es" else "WEO October 2025 — Country Summary"
     with st.expander(weo_title, expanded=True):
         for code, name, summary in country_summaries_to_show:
             color = COUNTRY_COLORS.get(code, "#636EFA")
+            flag = COUNTRY_FLAGS.get(code, "")
             st.markdown(
-                f"<h4 style='color:{color}; margin-bottom:0.3rem;'>{name}</h4>"
+                f"<h4 style='color:{color}; margin-bottom:0.3rem;'>{flag} {name}</h4>"
                 f"<p style='font-size:0.9rem; text-align:justify;'>{summary}</p>"
                 f"<hr style='margin:0.5rem 0;'>",
                 unsafe_allow_html=True,
