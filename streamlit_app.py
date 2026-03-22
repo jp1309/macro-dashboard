@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
+from country_summaries import COUNTRY_SUMMARIES
 
 # ── Config ───────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -422,6 +423,26 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+# ── Resúmenes WEO por país ──────────────────────────────────────────────────
+summaries_lang = COUNTRY_SUMMARIES.get(st.session_state.lang, COUNTRY_SUMMARIES["es"])
+country_summaries_to_show = [
+    (code, t_country(code), summaries_lang.get(code))
+    for code in selected_countries
+    if summaries_lang.get(code)
+]
+
+if country_summaries_to_show:
+    weo_title = "WEO Octubre 2025 — Resumen por país" if st.session_state.lang == "es" else "WEO October 2025 — Country Summary"
+    with st.expander(weo_title, expanded=False):
+        for code, name, summary in country_summaries_to_show:
+            color = COUNTRY_COLORS.get(code, "#636EFA")
+            st.markdown(
+                f"<h4 style='color:{color}; margin-bottom:0.3rem;'>{name}</h4>"
+                f"<p style='font-size:0.9rem; text-align:justify;'>{summary}</p>"
+                f"<hr style='margin:0.5rem 0;'>",
+                unsafe_allow_html=True,
+            )
 
 # ── Footer ───────────────────────────────────────────────────────────────────
 st.markdown(
