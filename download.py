@@ -118,7 +118,7 @@ INDICATORS = {
     "NGDPDPC":     "PIB per cápita (USD)",
     "PPPGDP":      "PIB PPA (miles de millones USD)",
     "PPPPC":       "PIB PPA per cápita (USD)",
-    "PPPSH":       "Participación en PIB mundial (%)",
+    "PPPSH":       "Participación en PIB mundial PPA (%)",
     # Precios y Empleo
     "PCPIPCH":     "Inflación IPC (%)",
     "LUR":         "Tasa de desempleo (%)",
