@@ -17,6 +17,8 @@ Dashboard interactivo de indicadores macroeconómicos para **América Latina, G7
 - Gráficos interactivos con Plotly + Streamlit
 - Modo Base 100 para comparar evolución relativa entre países
 - Eje Y duplicado (izquierda y derecha) para lectura desde ambos lados
+- Toggle idioma Español/English para toda la interfaz
+- Resúmenes WEO por país con banderas, extraídos del PDF oficial del FMI
 
 ## Requisitos
 
@@ -72,13 +74,17 @@ Se abre automáticamente en **http://localhost:8501**.
 
 ```
 macro-dashboard/
-├── streamlit_app.py              # Dashboard Streamlit
+├── streamlit_app.py              # Dashboard Streamlit (ES/EN)
 ├── download.py                   # Script de descarga desde API del FMI
+├── country_summaries.py          # Resúmenes WEO por país (ES/EN, 49 países)
 ├── requirements.txt              # Dependencias Python
+├── WEO_October_2025.pdf          # PDF oficial del WEO (fuente de resúmenes)
 ├── .github/workflows/
 │   └── update-data.yml           # GitHub Action para actualización automática
 ├── .gitignore
 ├── latam_weo_all.csv             # CSV maestro (generado por download.py)
+├── analysis/
+│   └── clustering_jerarquico/    # Análisis de clustering jerárquico
 └── README.md
 ```
 
@@ -96,6 +102,7 @@ Todos los controles están en el cuerpo principal de la página (no en sidebar):
 | **Base 100** | Toggle para normalizar series al primer año del rango |
 | **Presets** | Botones para seleccionar grupos de países predefinidos |
 | **Países** | Multi-select manual para agregar/quitar países individuales |
+| **Idioma** | Botón English/Español para cambiar idioma de toda la interfaz |
 
 ### Presets de países
 
@@ -117,8 +124,16 @@ Todos los controles están en el cuerpo principal de la página (no en sidebar):
 - **Zona sombreada** + línea vertical punteada → inicio de proyecciones
 - **Línea negra** en el eje Y=0 para referencia
 - **Eje Y duplicado** a izquierda y derecha para facilitar lectura
-- **Colores fijos** por país (Ecuador = rojo intenso), maximizando contraste visual
+- **Colores fijos** por país (Ecuador = rojo intenso, línea más gruesa), maximizando contraste visual
 - **Hover** muestra solo la información de la línea bajo el cursor
+
+### Idioma
+
+Botón **"English"** / **"Español"** en la parte superior para cambiar el idioma de toda la interfaz: título, categorías, indicadores, nombres de países, presets, etiquetas y resúmenes.
+
+### Resúmenes WEO por país
+
+Debajo del gráfico se muestran resúmenes del WEO más reciente para cada país seleccionado, con bandera emoji. Cada resumen incluye datos específicos de PIB, inflación y cuenta corriente extraídos del PDF oficial del FMI. Se actualizan semestralmente junto con los datos.
 
 ### Modo Base 100
 
