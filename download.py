@@ -130,7 +130,7 @@ INDICATORS = {
     "GGXWDG_NGDP": "Deuda pública bruta (% PIB)",
     # Sector Externo
     "BCA_NGDPD":   "Cuenta corriente (% PIB)",
-    "BCA":         "Cuenta corriente (USD, miles de millones)",
+    "BCA":         "Cuenta corriente (USD)",
     "TX_RPCH":     "Crecimiento exportaciones (%)",
     "TM_RPCH":     "Crecimiento importaciones (%)",
     "TXG_RPCH":    "Crecimiento exportaciones bienes (%)",
