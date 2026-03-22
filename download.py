@@ -118,6 +118,7 @@ INDICATORS = {
     "NGDPDPC":     "PIB per cápita (USD)",
     "PPPGDP":      "PIB PPA (miles de millones USD)",
     "PPPPC":       "PIB PPA per cápita (USD)",
+    "PPPSH":       "Participación en PIB mundial (%)",
     # Precios y Empleo
     "PCPIPCH":     "Inflación IPC (%)",
     "LUR":         "Tasa de desempleo (%)",
@@ -128,6 +129,7 @@ INDICATORS = {
     "GGX_NGDP":    "Gasto gobierno (% PIB)",
     "GGXCNL_NGDP": "Balance fiscal neto (% PIB)",
     "GGXWDG_NGDP": "Deuda pública bruta (% PIB)",
+    "GGXONLB_NGDP":"Balance fiscal primario (% PIB)",
     # Sector Externo
     "BCA_NGDPD":   "Cuenta corriente (% PIB)",
     "BCA":         "Cuenta corriente (USD)",

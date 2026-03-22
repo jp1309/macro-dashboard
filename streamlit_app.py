@@ -93,6 +93,7 @@ I18N = {
             "NGDPDPC":     "PIB per cápita (USD)",
             "PPPGDP":      "PIB PPA (miles de millones USD)",
             "PPPPC":       "PIB PPA per cápita (USD)",
+            "PPPSH":       "Participación en PIB mundial (%)",
             "PCPIPCH":     "Inflación IPC (%)",
             "LUR":         "Tasa de desempleo (%)",
             "LE":          "Empleo total (millones)",
@@ -101,6 +102,7 @@ I18N = {
             "GGX_NGDP":    "Gasto gobierno (% PIB)",
             "GGXCNL_NGDP": "Balance fiscal neto (% PIB)",
             "GGXWDG_NGDP": "Deuda pública bruta (% PIB)",
+            "GGXONLB_NGDP":"Balance fiscal primario (% PIB)",
             "BCA_NGDPD":   "Cuenta corriente (% PIB)",
             "BCA":         "Cuenta corriente (USD)",
             "TX_RPCH":     "Crecimiento exportaciones (%)",
@@ -154,6 +156,7 @@ I18N = {
             "NGDPDPC":     "GDP per capita (USD)",
             "PPPGDP":      "GDP PPP (USD, billions)",
             "PPPPC":       "GDP PPP per capita (USD)",
+            "PPPSH":       "Share of World GDP (%)",
             "PCPIPCH":     "CPI Inflation (%)",
             "LUR":         "Unemployment Rate (%)",
             "LE":          "Total Employment (millions)",
@@ -162,6 +165,7 @@ I18N = {
             "GGX_NGDP":    "Government Expenditure (% GDP)",
             "GGXCNL_NGDP": "Net Fiscal Balance (% GDP)",
             "GGXWDG_NGDP": "Gross Public Debt (% GDP)",
+            "GGXONLB_NGDP":"Primary Fiscal Balance (% GDP)",
             "BCA_NGDPD":   "Current Account (% GDP)",
             "BCA":         "Current Account (USD)",
             "TX_RPCH":     "Export Growth (%)",
@@ -201,9 +205,9 @@ PRESET_NAMES_EN = {
 
 # ── Indicadores (estructura interna) ────────────────────────────────────────
 INDICATOR_GROUPS = {
-    "PIB y Crecimiento": ["NGDP_RPCH", "NGDPD", "NGDPDPC", "PPPGDP", "PPPPC"],
+    "PIB y Crecimiento": ["NGDP_RPCH", "NGDPD", "NGDPDPC", "PPPGDP", "PPPPC", "PPPSH"],
     "Precios y Empleo": ["PCPIPCH", "LUR", "LP"],
-    "Finanzas Públicas": ["GGR_NGDP", "GGX_NGDP", "GGXCNL_NGDP", "GGXWDG_NGDP"],
+    "Finanzas Públicas": ["GGR_NGDP", "GGX_NGDP", "GGXCNL_NGDP", "GGXWDG_NGDP", "GGXONLB_NGDP"],
     "Sector Externo": ["BCA_NGDPD", "BCA", "TX_RPCH", "TM_RPCH", "TXG_RPCH", "TMG_RPCH"],
     "Ahorro e Inversión": ["NID_NGDP", "NGSD_NGDP"],
 }
@@ -213,7 +217,7 @@ indicator_lookup = dict(zip(indicators["indicator_code"], indicators["indicator_
 BASE100_ALLOWED = {
     "NGDPD", "NGDPDPC", "PPPGDP", "PPPPC",
     "LP", "LE", "LUR",
-    "GGR_NGDP", "GGX_NGDP", "GGXWDG_NGDP",
+    "GGR_NGDP", "GGX_NGDP", "GGXWDG_NGDP", "PPPSH",
     "NID_NGDP", "NGSD_NGDP",
 }
 

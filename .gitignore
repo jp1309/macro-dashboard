@@ -28,6 +28,8 @@ TXG_RPCH.csv
 TMG_RPCH.csv
 NID_NGDP.csv
 NGSD_NGDP.csv
+GGXONLB_NGDP.csv
+PPPSH.csv
 
 # IDE
 .vscode/
