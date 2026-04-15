@@ -69,13 +69,14 @@ COUNTRY_SUMMARIES = {
         ),
         "CRI": (
             "Según el WEO de abril 2026, Costa Rica registra un crecimiento del PIB de 4,1% en 2024, "
-            "que se acelera a 4,6% en 2025 y se modera a 3,6% en 2026 y 3,6% en 2027. La inflación "
-            "es negativa: –0,4% en 2024, –0,1% en 2025 y –0,4% en 2026, antes de subir a 2,0% en "
-            "2027. La cuenta corriente muestra un superávit de 0,9% del PIB en 2024, reduciéndose a "
-            "0,7% en 2025 y pasando a déficit de –1,5% en 2026. El desempleo baja de 6,9% a 6,3% en "
-            "2025. Como parte del grupo CAPDR, Costa Rica mantiene fundamentos macroeconómicos sólidos "
-            "aunque enfrenta los efectos indirectos del conflicto en Medio Oriente, la incertidumbre "
-            "comercial global y las restricciones migratorias de EE.UU. sobre los flujos de remesas."
+            "que se acelera a 4,6% en 2025 y se modera a 3,6% en 2026 y 2027. La inflación es "
+            "negativa: –0,4% en 2024, –0,1% en 2025 y –0,4% en 2026, antes de subir a 2,0% en 2027. "
+            "El déficit de cuenta corriente mejora de –0,9% del PIB en 2024 a –0,7% en 2025, antes "
+            "de ampliarse a –1,5% en 2026 y –1,6% en 2027. El desempleo baja de 6,9% en 2024 a "
+            "6,3% en 2025. Como parte del grupo CAPDR, Costa Rica mantiene fundamentos "
+            "macroeconómicos sólidos aunque enfrenta los efectos indirectos del conflicto en Medio "
+            "Oriente, la incertidumbre comercial global y las restricciones migratorias de EE.UU. "
+            "sobre los flujos de remesas."
         ),
         "CUB": (
             "Cuba no cuenta con proyecciones individuales en el WEO de abril 2026. El informe "
@@ -564,11 +565,11 @@ COUNTRY_SUMMARIES = {
             "According to the April 2026 WEO, Costa Rica records GDP growth of 4.1% in 2024, "
             "accelerating to 4.6% in 2025 and moderating to 3.6% in 2026 and 2027. Inflation is "
             "negative: -0.4% in 2024, -0.1% in 2025, and -0.4% in 2026, before rising to 2.0% in "
-            "2027. The current account shows a surplus of 0.9% of GDP in 2024, declining to 0.7% in "
-            "2025 and turning to a deficit of -1.5% in 2026. Unemployment falls from 6.9% to 6.3% in "
-            "2025. As part of the CAPDR group, Costa Rica maintains solid macroeconomic fundamentals "
-            "but faces indirect effects from the Middle East conflict, global trade uncertainty, and "
-            "US immigration restrictions affecting remittance flows."
+            "2027. The current account deficit improves from -0.9% of GDP in 2024 to -0.7% in 2025, "
+            "before widening to -1.5% in 2026 and -1.6% in 2027. Unemployment falls from 6.9% in "
+            "2024 to 6.3% in 2025. As part of the CAPDR group, Costa Rica maintains solid "
+            "macroeconomic fundamentals but faces indirect effects from the Middle East conflict, "
+            "global trade uncertainty, and US immigration restrictions affecting remittance flows."
         ),
         "CUB": (
             "Cuba has no individual projections in the April 2026 WEO. The report titled 'Global "
