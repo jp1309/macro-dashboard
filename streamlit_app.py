@@ -452,7 +452,7 @@ else:
     with col_dl:
         st.download_button(
             label=t["download_btn"],
-            data=export.to_csv(index=False).encode("utf-8"),
+            data=export.to_csv(index=False).encode("utf-8-sig"),
             file_name=filename,
             mime="text/csv",
             use_container_width=True,
