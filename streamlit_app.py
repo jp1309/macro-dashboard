@@ -80,6 +80,8 @@ I18N = {
         "footer_source": "Fuente: FMI — World Economic Outlook (última actualización: abril 2026)",
         "footer_legend": "Zona sombreada = proyecciones FMI  •  Línea punteada = datos proyectados",
         "footer_author": "Autor: Juan-Pablo Erráez",
+        "download_btn": "⬇ Descargar datos (CSV)",
+        "download_empty": "Sin datos para descargar con la selección actual.",
         "groups": {
             "PIB y Crecimiento": "PIB y Crecimiento",
             "Precios y Empleo": "Precios y Empleo",
@@ -143,6 +145,8 @@ I18N = {
         "footer_source": "Source: IMF — World Economic Outlook (last update: April 2026)",
         "footer_legend": "Shaded area = IMF projections  •  Dotted line = projected data",
         "footer_author": "Author: Juan-Pablo Erráez",
+        "download_btn": "⬇ Download data (CSV)",
+        "download_empty": "No data to download for the current selection.",
         "groups": {
             "PIB y Crecimiento": "GDP & Growth",
             "Precios y Empleo": "Prices & Employment",
@@ -427,6 +431,27 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+# ── Descarga CSV ─────────────────────────────────────────────────────────────
+if dff.empty:
+    st.caption(t["download_empty"])
+else:
+    export = dff[["country_code", "country_name", "year", "value", "is_projection"]].copy()
+    export.columns = (
+        ["country_code", "country_name", "year", desc, "is_projection"]
+        if st.session_state.lang == "en"
+        else ["código_país", "país", "año", desc, "es_proyección"]
+    )
+    filename = f"WEO_{indicator}_{y_min}-{y_max}.csv"
+    _, col_dl, _ = st.columns([4, 2, 4])
+    with col_dl:
+        st.download_button(
+            label=t["download_btn"],
+            data=export.to_csv(index=False).encode("utf-8"),
+            file_name=filename,
+            mime="text/csv",
+            use_container_width=True,
+        )
 
 # ── Resúmenes WEO por país ──────────────────────────────────────────────────
 summaries_lang = COUNTRY_SUMMARIES.get(st.session_state.lang, COUNTRY_SUMMARIES["es"])
