@@ -77,7 +77,7 @@ I18N = {
         "base100_warn": "Base 100 no aplicable a tasas de variación o indicadores con valores negativos",
         "proj_label": "Proyecciones FMI",
         "proj_suffix": "(proy.)",
-        "footer_source": "Fuente: FMI — World Economic Outlook (última actualización: octubre 2025)",
+        "footer_source": "Fuente: FMI — World Economic Outlook (última actualización: abril 2026)",
         "footer_legend": "Zona sombreada = proyecciones FMI  •  Línea punteada = datos proyectados",
         "footer_author": "Autor: Juan-Pablo Erráez",
         "groups": {
@@ -140,7 +140,7 @@ I18N = {
         "base100_warn": "Base 100 not applicable to growth rates or indicators with negative values",
         "proj_label": "IMF Projections",
         "proj_suffix": "(proj.)",
-        "footer_source": "Source: IMF — World Economic Outlook (last update: October 2025)",
+        "footer_source": "Source: IMF — World Economic Outlook (last update: April 2026)",
         "footer_legend": "Shaded area = IMF projections  •  Dotted line = projected data",
         "footer_author": "Author: Juan-Pablo Erráez",
         "groups": {
@@ -405,7 +405,7 @@ fig.update_layout(
         text=f"{desc}  (Base 100 = {y_min})" if base100_valid else desc,
         font=dict(size=18),
     ),
-    xaxis=dict(title="", dtick=5, gridcolor="rgba(0,0,0,0.05)"),
+    xaxis=dict(title="", dtick=2, gridcolor="rgba(0,0,0,0.05)"),
     yaxis=dict(
         title=y_title, gridcolor="rgba(0,0,0,0.1)",
         zeroline=True, zerolinecolor="black", zerolinewidth=1.5,
@@ -451,7 +451,7 @@ COUNTRY_FLAGS = {
 _FLAG_URL = "https://flagcdn.com/24x18/{}.png"
 
 if country_summaries_to_show:
-    weo_title = "WEO Octubre 2025 — Resumen por país" if st.session_state.lang == "es" else "WEO October 2025 — Country Summary"
+    weo_title = "WEO Abril 2026 — Resumen por país" if st.session_state.lang == "es" else "WEO April 2026 — Country Summary"
     with st.expander(weo_title, expanded=True):
         for code, name, summary in country_summaries_to_show:
             color = COUNTRY_COLORS.get(code, "#636EFA")
