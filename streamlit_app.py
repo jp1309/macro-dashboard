@@ -21,15 +21,20 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "latam_weo_all.csv")
 
 
-@st.cache_data(ttl=3600)
-def load_data():
+def _csv_mtime():
+    """Devuelve el timestamp de modificación del CSV para invalidar el caché cuando cambia."""
+    return os.path.getmtime(DATA_PATH)
+
+
+@st.cache_data(hash_funcs={float: lambda x: x})
+def load_data(mtime: float):
     data = pd.read_csv(DATA_PATH)
     data["is_projection"] = data["is_projection"].astype(str).str.strip().str.lower() == "true"
     data["value"] = pd.to_numeric(data["value"], errors="coerce")
     return data
 
 
-df = load_data()
+df = load_data(_csv_mtime())
 
 indicators = (
     df[["indicator_code", "indicator_description"]]
