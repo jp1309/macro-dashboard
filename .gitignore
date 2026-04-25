@@ -30,6 +30,13 @@ NID_NGDP.csv
 NGSD_NGDP.csv
 GGXONLB_NGDP.csv
 PPPSH.csv
+NGDP.csv
+NGDPPC.csv
+PCPIEPCH.csv
+GGR.csv
+GGX.csv
+GGXCNL.csv
+GGXWDG.csv
 
 # IDE
 .vscode/

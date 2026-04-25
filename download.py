@@ -114,20 +114,27 @@ COUNTRY_GROUPS = [
 INDICATORS = {
     # PIB y Crecimiento
     "NGDP_RPCH":   "Crecimiento real del PIB (%)",
+    "NGDP":        "PIB nominal (moneda local, miles de millones)",
     "NGDPD":       "PIB nominal (USD, miles de millones)",
+    "NGDPPC":      "PIB per cápita (moneda local)",
     "NGDPDPC":     "PIB per cápita (USD)",
     "PPPGDP":      "PIB PPA (miles de millones USD)",
     "PPPPC":       "PIB PPA per cápita (USD)",
     "PPPSH":       "Participación en PIB mundial PPA (%)",
     # Precios y Empleo
-    "PCPIPCH":     "Inflación IPC (%)",
+    "PCPIPCH":     "Inflación IPC promedio (%)",
+    "PCPIEPCH":    "Inflación IPC fin de período (%)",
     "LUR":         "Tasa de desempleo (%)",
     "LE":          "Empleo total (millones)",
     "LP":          "Población (millones)",
     # Finanzas Públicas
+    "GGR":         "Ingresos gobierno (moneda local)",
     "GGR_NGDP":    "Ingresos gobierno (% PIB)",
+    "GGX":         "Gasto gobierno (moneda local)",
     "GGX_NGDP":    "Gasto gobierno (% PIB)",
+    "GGXCNL":      "Balance fiscal neto (moneda local)",
     "GGXCNL_NGDP": "Balance fiscal neto (% PIB)",
+    "GGXWDG":      "Deuda pública bruta (moneda local)",
     "GGXWDG_NGDP": "Deuda pública bruta (% PIB)",
     "GGXONLB_NGDP":"Balance fiscal primario (% PIB)",
     # Sector Externo
