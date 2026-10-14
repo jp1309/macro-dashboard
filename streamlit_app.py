@@ -418,14 +418,21 @@ for code in selected_countries:
 
     if not proj.empty:
         bridge = pd.concat([obs.iloc[[-1]], proj]) if not obs.empty else proj
+        # El primer punto del puente es el último dato observado: se rotula y dibuja como observado
+        n_bridge = 0 if obs.empty else 1
+        obs_hover = f"<b>{name}</b><br>%{{x}}: %{{y:,.2f}}<extra></extra>"
+        proj_hover = f"<b>{name} {t['proj_suffix']}</b><br>%{{x}}: %{{y:,.2f}}<extra></extra>"
         fig.add_trace(
             go.Scatter(
                 x=bridge["year"], y=bridge["value"],
                 mode="lines+markers", name=f"{name} {t['proj_suffix']}",
                 line=dict(color=color, width=line_width, dash="dot"),
-                marker=dict(size=marker_size, color=color, symbol="diamond-open"),
+                marker=dict(
+                    size=marker_size, color=color,
+                    symbol=["circle"] * n_bridge + ["diamond-open"] * len(proj),
+                ),
                 legendgroup=code, showlegend=False,
-                hovertemplate=f"<b>{name} {t['proj_suffix']}</b><br>%{{x}}: %{{y:,.2f}}<extra></extra>",
+                hovertemplate=[obs_hover] * n_bridge + [proj_hover] * len(proj),
             )
         )
 
