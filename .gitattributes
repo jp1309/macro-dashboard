@@ -1,0 +1,2 @@
+# El CSV maestro se guarda con LF desde download.py; sin conversiones de git
+latam_weo_all.csv -text

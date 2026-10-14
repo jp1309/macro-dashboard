@@ -4,10 +4,11 @@ Macro Dashboard — FMI World Economic Outlook
 Autor: Juan-Pablo Erráez
 """
 import os
+import json
 import pandas as pd
 import streamlit as st
 import plotly.graph_objects as go
-from country_summaries import COUNTRY_SUMMARIES
+from country_summaries import COUNTRY_SUMMARIES, SUMMARIES_EDITION
 
 # ── Config ───────────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -19,6 +20,7 @@ st.set_page_config(
 # ── Datos ────────────────────────────────────────────────────────────────────
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_PATH = os.path.join(BASE_DIR, "latam_weo_all.csv")
+META_PATH = os.path.join(BASE_DIR, "weo_meta.json")  # lo escribe download.py
 
 
 def _csv_mtime():
@@ -35,6 +37,28 @@ def load_data(mtime: float):
 
 
 df = load_data(_csv_mtime())
+
+
+def load_meta():
+    try:
+        with open(META_PATH, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return {}
+
+
+# Edición del WEO de los datos ("2026-10"); sin weo_meta.json se asume la de los resúmenes
+DATA_EDITION = load_meta().get("edition", SUMMARIES_EDITION)
+
+_EDITION_MONTHS = {"es": {4: "abril", 10: "octubre"}, "en": {4: "April", 10: "October"}}
+
+
+def edition_label(edition, lang, title=False):
+    """'2026-10' -> 'octubre 2026' / 'October 2026' ('Octubre 2026' con title=True)."""
+    year, month = edition.split("-")
+    label = f"{_EDITION_MONTHS[lang].get(int(month), month)} {year}"
+    return label[0].upper() + label[1:] if title else label
+
 
 indicators = (
     df[["indicator_code", "indicator_description"]]
@@ -82,7 +106,16 @@ I18N = {
         "base100_warn": "Base 100 no aplicable a tasas de variación o indicadores con valores negativos",
         "proj_label": "Proyecciones FMI",
         "proj_suffix": "(proy.)",
-        "footer_source": "Fuente: FMI — World Economic Outlook (última actualización: abril 2026)",
+        "footer_source": "Fuente: FMI — World Economic Outlook (edición: {edition})",
+        "summaries_title": "WEO {edition} — Resumen por país",
+        "summaries_stale": "Los datos ya corresponden al WEO de {data}. Los textos de los resúmenes "
+                           "aún se basan en el WEO de {summ}; las cifras clave sí están actualizadas.",
+        "kf_labels": {
+            "NGDP_RPCH": "PIB real (%)", "PCPIPCH": "Inflación (%)", "LUR": "Desempleo (%)",
+            "BCA_NGDPD": "Cuenta corriente (% PIB)", "GGXCNL_NGDP": "Balance fiscal (% PIB)",
+            "GGXWDG_NGDP": "Deuda pública (% PIB)",
+        },
+        "kf_proj": "p = proyección",
         "footer_legend": "Zona sombreada = proyecciones FMI  •  Línea punteada = datos proyectados",
         "footer_author": "Autor: Juan-Pablo Erráez",
         "download_btn": "⬇ Descargar datos (CSV)",
@@ -147,7 +180,16 @@ I18N = {
         "base100_warn": "Base 100 not applicable to growth rates or indicators with negative values",
         "proj_label": "IMF Projections",
         "proj_suffix": "(proj.)",
-        "footer_source": "Source: IMF — World Economic Outlook (last update: April 2026)",
+        "footer_source": "Source: IMF — World Economic Outlook ({edition} edition)",
+        "summaries_title": "WEO {edition} — Country Summary",
+        "summaries_stale": "The data already reflect the {data} WEO. Summary texts are still based on "
+                           "the {summ} WEO; key figures are up to date.",
+        "kf_labels": {
+            "NGDP_RPCH": "Real GDP (%)", "PCPIPCH": "Inflation (%)", "LUR": "Unemployment (%)",
+            "BCA_NGDPD": "Current account (% GDP)", "GGXCNL_NGDP": "Fiscal balance (% GDP)",
+            "GGXWDG_NGDP": "Public debt (% GDP)",
+        },
+        "kf_proj": "p = projection",
         "footer_legend": "Shaded area = IMF projections  •  Dotted line = projected data",
         "footer_author": "Author: Juan-Pablo Erráez",
         "download_btn": "⬇ Download data (CSV)",
@@ -480,15 +522,62 @@ COUNTRY_FLAGS = {
 }
 _FLAG_URL = "https://flagcdn.com/24x18/{}.png"
 
+# Cifras clave por país: salen del CSV, así que siempre coinciden con la edición de los datos
+KEY_FIGURES = ["NGDP_RPCH", "PCPIPCH", "LUR", "BCA_NGDPD", "GGXCNL_NGDP", "GGXWDG_NGDP"]
+KF_YEARS = [PROJECTION_YEAR - 1, PROJECTION_YEAR, PROJECTION_YEAR + 1]
+_kf = df[df["indicator_code"].isin(KEY_FIGURES) & df["year"].isin(KF_YEARS)]
+KF_VALUES = {
+    (r.country_code, r.indicator_code, r.year): r.value
+    for r in _kf.itertuples(index=False)
+}
+
+
+def key_figures_html(code, lang):
+    def fmt(v):
+        if v is None or pd.isna(v):
+            return "—"
+        txt = f"{v:,.1f}".replace("-", "–")
+        return txt.replace(",", "X").replace(".", ",").replace("X", ".") if lang == "es" else txt
+
+    cell = "padding:1px 8px; text-align:right;"
+    head = "".join(
+        f"<th style='{cell} font-weight:600;'>{y}{'p' if y >= PROJECTION_YEAR else ''}</th>"
+        for y in KF_YEARS
+    )
+    rows = ""
+    for ind in KEY_FIGURES:
+        vals = [KF_VALUES.get((code, ind, y)) for y in KF_YEARS]
+        if all(v is None for v in vals):
+            continue
+        rows += (
+            f"<tr><td style='padding:1px 8px 1px 0;'>{t['kf_labels'][ind]}</td>"
+            + "".join(f"<td style='{cell}'>{fmt(v)}</td>" for v in vals)
+            + "</tr>"
+        )
+    if not rows:
+        return ""
+    return (
+        "<table style='font-size:0.8rem; border-collapse:collapse; margin:0.2rem 0 0.4rem 0;'>"
+        f"<tr><th></th>{head}</tr>{rows}</table>"
+        f"<p style='font-size:0.7rem; color:gray; margin:0 0 0.4rem 0;'>{t['kf_proj']}</p>"
+    )
+
+
 if country_summaries_to_show:
-    weo_title = "WEO Abril 2026 — Resumen por país" if st.session_state.lang == "es" else "WEO April 2026 — Country Summary"
+    lang = st.session_state.lang
+    weo_title = t["summaries_title"].format(edition=edition_label(SUMMARIES_EDITION, lang, title=True))
     with st.expander(weo_title, expanded=True):
+        if SUMMARIES_EDITION != DATA_EDITION:
+            st.info(t["summaries_stale"].format(
+                data=edition_label(DATA_EDITION, lang), summ=edition_label(SUMMARIES_EDITION, lang),
+            ))
         for code, name, summary in country_summaries_to_show:
             color = COUNTRY_COLORS.get(code, "#636EFA")
             flag_code = COUNTRY_FLAGS.get(code, "")
             flag_img = f'<img src="{_FLAG_URL.format(flag_code)}" style="vertical-align:middle; margin-right:6px;">' if flag_code else ""
             st.markdown(
                 f"<h4 style='color:{color}; margin-bottom:0.3rem;'>{flag_img}{name}</h4>"
+                f"{key_figures_html(code, lang)}"
                 f"<p style='font-size:0.9rem; text-align:justify;'>{summary}</p>"
                 f"<hr style='margin:0.5rem 0;'>",
                 unsafe_allow_html=True,
@@ -497,7 +586,7 @@ if country_summaries_to_show:
 # ── Footer ───────────────────────────────────────────────────────────────────
 st.markdown(
     f"<p style='text-align:center; color:gray; font-size:0.8rem;'>"
-    f"{t['footer_source']}"
+    f"{t['footer_source'].format(edition=edition_label(DATA_EDITION, st.session_state.lang))}"
     f"  •  {t['footer_legend']}"
     f"</p>"
     f"<p style='text-align:center; color:gray; font-size:0.75rem;'>"

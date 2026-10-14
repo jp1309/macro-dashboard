@@ -10,22 +10,32 @@ El FMI publica nuevas ediciones del WEO dos veces al año:
   • Abril      → datos actualizados + proyecciones nuevas
   • Octubre    → revisión completa del año en curso
 
-Recomendación: correr este script en mayo y noviembre de cada año.
+El GitHub Action (.github/workflows/update-data.yml) lo corre a diario
+en abril, septiembre y octubre y sube los datos apenas detecta una
+edición nueva.
 
 CÓMO ACTUALIZAR
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 1. Correr:
        python download.py
-2. Los CSVs individuales y el maestro se sobreescriben automáticamente.
+2. Los CSVs individuales, el maestro y weo_meta.json se sobreescriben.
 3. No hay END_YEAR fijo — la API devuelve todos los años disponibles,
    incluyendo nuevas proyecciones que el FMI extienda.
+4. Si falla algún indicador, el script termina con error y NO toca el
+   maestro ni weo_meta.json (evita publicar datos incompletos).
 
-NOTA SOBRE PROYECCIONES
+EDICIÓN Y PROYECCIONES
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-PROJECTION_START_YEAR se calcula automáticamente como el año actual.
-Datos del año en curso y posteriores se marcan como proyección.
+La API informa la fecha de publicación del dataset (PUBLICATION_DATE).
+De ahí se derivan:
+  • la edición (abril u octubre de ese año) → weo_meta.json, que usa el
+    dashboard para sus etiquetas;
+  • PROJECTION_START_YEAR = año de publicación: ese año y los siguientes
+    se marcan como proyección.
 """
 import sys
+import json
+import datetime
 import requests
 import pandas as pd
 from lxml import etree
@@ -33,11 +43,11 @@ import os
 import time
 
 # ── Configuración de años ───────────────────────────────────────────────────
-import datetime
-START_YEAR            = 1980
+START_YEAR = 1980
 # Sin END_YEAR fijo: la API devuelve todos los años disponibles (incluye
 # proyecciones que el FMI extienda a futuro, ej. 2031+).
-PROJECTION_START_YEAR = datetime.date.today().year  # primer año sin datos observados
+# El año de inicio de proyecciones se toma de la fecha de publicación del WEO
+# (ver weo_edition()); no depende del día en que se corra el script.
 
 # ── Países de América Latina (código ISO3 WEO) ─────────────────────────────
 LATAM = {
@@ -151,6 +161,10 @@ INDICATORS = {
 
 BASE_URL     = "https://api.imf.org/external/sdmx/2.1/data/IMF.RES,WEO,+/"
 OUTPUT_DIR   = os.path.dirname(os.path.abspath(__file__))
+META_PATH    = os.path.join(OUTPUT_DIR, "weo_meta.json")
+
+# Fechas de publicación vistas en las respuestas de la API
+PUBLICATION_DATES = set()
 
 MAX_RETRIES  = 4
 BASE_DELAY   = 3     # delay base entre requests (segundos)
@@ -180,6 +194,11 @@ def _fetch_group(indicator: str, country_codes: list) -> list:
     root = etree.fromstring(r.content)
     rows = []
 
+    for dataset in root.iter("{*}DataSet"):
+        pub = dataset.get("PUBLICATION_DATE")
+        if pub:
+            PUBLICATION_DATES.add(pub[:10])
+
     for series in root.iter("Series"):
         country = series.get("COUNTRY")
         if country not in ALL_COUNTRIES:
@@ -192,7 +211,6 @@ def _fetch_group(indicator: str, country_codes: list) -> list:
                     "country_name":  ALL_COUNTRIES[country],
                     "year":          year,
                     "value":         float(obs.get("OBS_VALUE")),
-                    "is_projection": year >= PROJECTION_START_YEAR,
                 })
             except (ValueError, TypeError):
                 pass
@@ -211,9 +229,25 @@ def fetch_indicator(indicator: str) -> pd.DataFrame:
     return pd.DataFrame(all_rows)
 
 
+def weo_edition(publication_date: str) -> dict:
+    """Deriva la edición del WEO a partir de la fecha de publicación (YYYY-MM-DD).
+
+    El WEO sale en abril y en septiembre/octubre: lo publicado en el primer
+    semestre es la edición de abril; lo del segundo, la de octubre.
+    """
+    pub = datetime.date.fromisoformat(publication_date)
+    month = 4 if pub.month <= 6 else 10
+    return {
+        "edition": f"{pub.year}-{month:02d}",
+        "publication_date": pub.isoformat(),
+        "projection_start_year": pub.year,
+    }
+
+
 def main():
     total      = len(INDICATORS)
     all_frames = []
+    failed     = []
 
     print(f"Descargando {total} indicadores para {len(ALL_COUNTRIES)} paises "
           f"(desde {START_YEAR})...\n", flush=True)
@@ -225,36 +259,56 @@ def main():
             df = fetch_indicator(code)
             if df.empty:
                 print("SIN DATOS")
+                failed.append(code)
                 continue
 
             df["indicator_code"]        = code
             df["indicator_description"] = description
             all_frames.append(df)
-
-            out_path = os.path.join(OUTPUT_DIR, f"{code}.csv")
-            df.to_csv(out_path, index=False, encoding="utf-8")
             print(f"{len(df)} filas")
         except Exception as e:
             print(f"ERROR: {e}")
+            failed.append(code)
 
         time.sleep(BASE_DELAY)
 
-    if all_frames:
-        master      = pd.concat(all_frames, ignore_index=True)
-        master_path = os.path.join(OUTPUT_DIR, "latam_weo_all.csv")
-        master.to_csv(master_path, index=False, encoding="utf-8")
-        obs  = master[~master["is_projection"]].shape[0]
-        proj = master[ master["is_projection"]].shape[0]
-        print(f"\nCSV maestro: latam_weo_all.csv")
-        print(f"  Total filas : {len(master):,}")
-        print(f"  Observados  : {obs:,}  (hasta {PROJECTION_START_YEAR - 1})")
-        max_year = int(master["year"].max())
-        print(f"  Proyecciones: {proj:,}  ({PROJECTION_START_YEAR}-{max_year})")
-        print(f"\nProxima actualizacion recomendada:")
-        print(f"  Mayo    (tras publicacion WEO de abril)")
-        print(f"  Noviembre (tras publicacion WEO de octubre)")
-    else:
-        print("\nNo se descargo ningun dato.")
+    if failed:
+        # No sobrescribir el maestro con datos incompletos
+        print(f"\nFallaron {len(failed)} indicadores: {', '.join(failed)}")
+        print("latam_weo_all.csv y weo_meta.json NO fueron modificados.")
+        sys.exit(1)
+
+    if not PUBLICATION_DATES:
+        print("\nLa API no informó PUBLICATION_DATE; no se puede determinar la edición.")
+        print("latam_weo_all.csv y weo_meta.json NO fueron modificados.")
+        sys.exit(1)
+
+    meta = weo_edition(max(PUBLICATION_DATES))
+    proj_start = meta["projection_start_year"]
+
+    master = pd.concat(all_frames, ignore_index=True)
+    master.insert(4, "is_projection", master["year"] >= proj_start)
+
+    # CSVs individuales por indicador (ignorados por git)
+    for code, sub in master.groupby("indicator_code", sort=False):
+        sub.to_csv(os.path.join(OUTPUT_DIR, f"{code}.csv"), index=False, encoding="utf-8",
+                   lineterminator="\n")
+
+    master_path = os.path.join(OUTPUT_DIR, "latam_weo_all.csv")
+    # Fin de línea fijo: el mismo archivo byte a byte en Windows y en el runner Linux
+    master.to_csv(master_path, index=False, encoding="utf-8", lineterminator="\n")
+    with open(META_PATH, "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
+        f.write("\n")
+
+    obs  = master[~master["is_projection"]].shape[0]
+    proj = master[ master["is_projection"]].shape[0]
+    max_year = int(master["year"].max())
+    print(f"\nEdición WEO  : {meta['edition']} (publicada {meta['publication_date']})")
+    print(f"CSV maestro  : latam_weo_all.csv")
+    print(f"  Total filas : {len(master):,}")
+    print(f"  Observados  : {obs:,}  (hasta {proj_start - 1})")
+    print(f"  Proyecciones: {proj:,}  ({proj_start}-{max_year})")
 
 
 if __name__ == "__main__":

@@ -2,49 +2,82 @@ name: Actualizar datos WEO del FMI
 
 on:
   schedule:
-    # Abril: días 14-18 a las 10:00 UTC
-    - cron: "0 10 14-18 4 *"
-    # Octubre: días 14-18 a las 10:00 UTC
-    - cron: "0 10 14-18 10 *"
+    # El FMI publica el WEO en abril y en septiembre/octubre, en fechas que
+    # varían cada año (p. ej. 22-abr-2025, 13-oct-2026). Se revisa a diario
+    # del 1 al 31 de abril, septiembre y octubre; si no hay datos nuevos no se
+    # hace nada.
+    - cron: "0 10 * 4,9,10 *"
   workflow_dispatch:  # permite ejecución manual
+
+# contents: push del CSV actualizado · issues: aviso para actualizar resúmenes
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
       - name: Instalar dependencias
         run: pip install requests pandas lxml
 
-      - name: Guardar hash actual del CSV
-        run: sha256sum latam_weo_all.csv > /tmp/hash_before.txt
-
       - name: Descargar datos del FMI
+        # Si algún indicador falla, download.py termina con error y no toca
+        # latam_weo_all.csv ni weo_meta.json.
         run: python download.py
 
       - name: Verificar si hay datos nuevos
         id: check
         run: |
-          sha256sum latam_weo_all.csv > /tmp/hash_after.txt
-          if diff -q /tmp/hash_before.txt /tmp/hash_after.txt > /dev/null 2>&1; then
+          # status (no diff) para detectar también weo_meta.json si es nuevo
+          if [ -z "$(git status --porcelain -- latam_weo_all.csv weo_meta.json)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
-            echo "Sin cambios en los datos — WEO aún no actualizado."
+            echo "Sin cambios en los datos — WEO aún no actualizado." | tee -a "$GITHUB_STEP_SUMMARY"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            echo "Datos actualizados detectados."
+            echo "Datos actualizados detectados." | tee -a "$GITHUB_STEP_SUMMARY"
+            git diff --stat -- latam_weo_all.csv weo_meta.json >> "$GITHUB_STEP_SUMMARY"
           fi
+          echo "edition=$(python -c 'import json; print(json.load(open("weo_meta.json"))["edition"])')" >> "$GITHUB_OUTPUT"
+          echo "summaries=$(python -c 'from country_summaries import SUMMARIES_EDITION; print(SUMMARIES_EDITION)')" >> "$GITHUB_OUTPUT"
 
       - name: Commit y push si hay datos nuevos
         if: steps.check.outputs.changed == 'true'
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add latam_weo_all.csv
-          git commit -m "Actualización automática datos WEO $(date +'%B %Y')"
-          git push
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add latam_weo_all.csv weo_meta.json
+          git commit -m "Actualización automática datos WEO ${{ steps.check.outputs.edition }}"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin "HEAD:${GITHUB_REF_NAME}"
+
+      - name: Abrir issue si los resúmenes por país quedaron desactualizados
+        if: steps.check.outputs.edition != steps.check.outputs.summaries
+        continue-on-error: true  # un aviso; no debe marcar como fallida la actualización de datos
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EDITION: ${{ steps.check.outputs.edition }}
+          SUMMARIES: ${{ steps.check.outputs.summaries }}
+        run: |
+          title="Actualizar resúmenes por país al WEO ${EDITION}"
+          if gh issue list --state open --search "in:title \"${title}\"" --json number --jq 'length' | grep -qx 0; then
+            gh issue create --title "$title" --body "Los datos del dashboard ya corresponden al WEO **${EDITION}**, pero \`country_summaries.py\` sigue en **${SUMMARIES}**.
+
+          Mientras tanto, el dashboard muestra un aviso sobre los resúmenes y las cifras clave de cada país ya salen de los datos nuevos.
+
+          Para cerrar este issue: reescribir los textos con el informe del WEO ${EDITION} y cambiar \`SUMMARIES_EDITION = \"${EDITION}\"\` en \`country_summaries.py\`."
+          else
+            echo "Ya existe un issue abierto: ${title}"
+          fi
